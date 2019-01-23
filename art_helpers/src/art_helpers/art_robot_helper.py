@@ -17,7 +17,12 @@ class ArtRobotHelper(object):
     def __init__(self, robot_ns="/art/robot"):
         self.robot_ns = robot_ns
         self.arms = []
-        self.robot_parameters = rospy.get_param(self.robot_ns, None)
+        self.robot_parameters = None
+        while not self.robot_parameters or rospy.is_shutdown():
+            self.robot_parameters = rospy.get_param(self.robot_ns, None)
+            rospy.loginfo("Waiting for /art/robot param")
+            rospy.sleep(1)
+
         self.capabilities = [cap for cap in self.robot_parameters.get('capabilities', {})]
         if self.robot_parameters is None:
             raise RobotParametersNotOnParameterServer
